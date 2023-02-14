@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
+use App\Libraries\ResponseBase;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 
@@ -12,6 +13,7 @@ class AdminController extends Controller
 {
     public function login(Request $request)
     {
+        $response = [];
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -20,26 +22,26 @@ class AdminController extends Controller
 
         $token = Auth::attempt($credentials);
         if (!$token) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 401);
+            $response['message'] = "Unauthorized";
+            return ResponseBase::error($response, 403);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'authorization' => [
+        $response = [
+            'data' => [
                 'token' => $token,
                 'type' => 'bearer',
-            ]
-        ]);
+            ],
+            'message' => 'Successfully Login'
+        ];
+
+        return ResponseBase::success($response);
     }
 
     public function register(Request $request)
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:admins',
+            'email' => 'required|string|email|max:255|unique:admin',
             'password' => 'required',
         ];
 
