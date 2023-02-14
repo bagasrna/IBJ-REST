@@ -13,10 +13,10 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest();
+        $categories = Category::all();
         $response = [];
 
-        if ($categories) {
+        if (count($categories) > 0) {
             $response = [
                 'data' => $categories,
                 'message' => "Successfully recieved categories",
@@ -25,12 +25,12 @@ class CategoryController extends Controller
         }
 
         $response['message'] = "Categories not found";
-        return ResponseBase::error($response, 409);
+        return ResponseBase::error($response, 404);
     }
 
     public function store(Request $request)
     {
-        $rules['name'] ='required|max:255|unique:categories';
+        $rules['name'] ='required|max:255|unique:course_categories';
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails())
@@ -59,19 +59,19 @@ class CategoryController extends Controller
 
         if ($category) {
             $response = [
-                'data' => $categories,
+                'data' => $category,
                 'message' => "Successfully recieved category",
             ];
             return ResponseBase::success($response);
         }
 
         $response['message'] = "Category not found";
-        return ResponseBase::error($response, 409);
+        return ResponseBase::error($response, 404);
     }
 
     public function update(Request $request, $id)
     {
-        $rules['name'] = ['required', 'string', 'max:255', Rule::unique('categories')->ignore($id)];
+        $rules['name'] = ['required', 'string', 'max:255', Rule::unique('course_categories')->ignore($id)];
 
         $validator = Validator::make($request->all(), $rules);
 
@@ -83,7 +83,7 @@ class CategoryController extends Controller
             $response = [];
             if (!$category){
                 $response['message'] = "Category not found";
-                return ResponseBase::error($response);
+                return ResponseBase::error($response, 404);
             }
 
             $category->name = $request->name;
@@ -102,11 +102,11 @@ class CategoryController extends Controller
     public function delete($id)
     {
         try {
-            $category = Category::find($id);
+            $category = Category::with('courses')->find($id);
             $response = [];
             if (!$category){
                 $response['message'] = "Category not found";
-                return ResponseBase::error($response);
+                return ResponseBase::error($response, 404);
             }
 
             $category->delete();
