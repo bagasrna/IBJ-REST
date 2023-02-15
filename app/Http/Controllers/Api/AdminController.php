@@ -13,7 +13,6 @@ class AdminController extends Controller
 {
     public function login(Request $request)
     {
-        $response = [];
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -22,8 +21,7 @@ class AdminController extends Controller
 
         $token = Auth::attempt($credentials);
         if (!$token) {
-            $response['message'] = "Unauthorized";
-            return ResponseBase::error($response, 403);
+            return ResponseBase::error("Unauthorized", 403);
         }
 
         $response = [
@@ -56,17 +54,13 @@ class AdminController extends Controller
             $admin->password = bcrypt($request->password);
             $admin->save();
 
-            return response()->json([
-                'status' => "success",
-                'message' => "Admin Register Successfully!",
-                'data'    => $admin,
-            ], 201);
+            $response = [
+                'data' => $admin,
+                'message' => "Successfully registered admin",
+            ];
+            return ResponseBase::success($response, 201);
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => "success",
-                'message' => "Failed Register Admin!",
-                'error' => $e->getMessage()
-            ], 409);
+            return ResponseBase::error($e->getMessage(), 409);
         }
     }
 }
