@@ -69,7 +69,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // set time zone to indonesia
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
