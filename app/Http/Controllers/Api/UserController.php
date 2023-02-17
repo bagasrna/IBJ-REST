@@ -13,7 +13,12 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        if (Cache::has('users')) {
+            $users = Cache::get('users');
+        } else {
+            $users = User::all();
+            Cache::put('users', $users, 600);
+        }
         if (count($users) > 0) {
             $response = [
                 'data' => $users,
@@ -43,6 +48,8 @@ class UserController extends Controller
             $user->email = $request->email;
             $user->password = bcrypt($request->password);
             $user->save();
+
+            Cache::forget('users');
 
             $response = [
                 'data' => $user,
@@ -93,6 +100,8 @@ class UserController extends Controller
             $user->password = bcrypt($request->password);
             $user->save();
 
+            Cache::forget('users');
+
             $response = [
                 'data' => $user,
                 'message' => "Successfully updated user",
@@ -112,6 +121,7 @@ class UserController extends Controller
             }
 
             $user->delete();
+            Cache::forget('courses');
             $response = [
                 'message' => "Successfully deleted user",
             ];

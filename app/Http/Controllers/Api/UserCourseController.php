@@ -16,7 +16,12 @@ class UserCourseController extends Controller
 {
     public function index()
     {
-        $user_courses = UserCourse::all();
+        if (Cache::has('user_courses')) {
+            $user_courses = Cache::get('user_courses');
+        } else {
+            $user_courses = UserCourse::all();
+            Cache::put('user_courses', $user_courses, 600);
+        }
         if (count($user_courses) > 0) {
             $response = [
                 'data' => $user_courses,
@@ -55,6 +60,8 @@ class UserCourseController extends Controller
             $user_course->users_id = $request->users_id;
             $user_course->course_id = $request->course_id;
             $user_course->save();
+
+            Cache::forget('user_courses');
 
             $response = [
                 'data' => $user_course,
@@ -132,6 +139,8 @@ class UserCourseController extends Controller
             $user_course->course_id = $request->course_id;
             $user_course->save();
 
+            Cache::forget('user_courses');
+
             $response = [
                 'data' => $user_course,
                 'message' => "Successfully updated user course",
@@ -151,6 +160,7 @@ class UserCourseController extends Controller
             }
 
             $user_course->delete();
+            Cache::forget('courses');
             $response = [
                 'message' => "Successfully deleted user course",
             ];

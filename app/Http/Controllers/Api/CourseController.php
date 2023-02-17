@@ -14,7 +14,12 @@ class CourseController extends Controller
 {
     public function index()
     {
-        $courses = Course::all();
+        if (Cache::has('courses')) {
+            $courses = Cache::get('courses');
+        } else {
+            $courses = Course::all();
+            Cache::put('courses', $courses, 600);
+        }
         if (count($courses) > 0) {
             $response = [
                 'data' => $courses,
@@ -30,7 +35,7 @@ class CourseController extends Controller
     {
         $rules = [
             'title' => 'required|max:255|unique:courses',
-            'course_category_id' => 'required|numeric',
+            'course_category_id' => 'required|numeric|exists:course_categories,id',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -38,15 +43,12 @@ class CourseController extends Controller
             return response()->json($validator->errors(), 422);
 
         try {
-            $category = Category::find($request->course_category_id);
-            if(!$category){
-                return ResponseBase::error("Category not found", 404);
-            }
-
             $course = new Course();
             $course->title = $request->title;
             $course->course_category_id = $request->course_category_id;
             $course->save();
+
+            Cache::forget('courses');
 
             $response = [
                 'data' => $course,
@@ -77,7 +79,7 @@ class CourseController extends Controller
     {
         $rules = [
             'title' => ['required', 'string', 'max:255', Rule::unique('courses')->ignore($id)],
-            'course_category_id' => 'required|numeric',
+            'course_category_id' => 'required|numeric|exists:course_categories,id',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -94,6 +96,8 @@ class CourseController extends Controller
             $course->title = $request->title;
             $course->course_category_id = $request->course_category_id;
             $course->save();
+
+            Cache::forget('courses');
 
             $response = [
                 'data' => $course,
@@ -114,6 +118,7 @@ class CourseController extends Controller
             }
 
             $course->delete();
+            Cache::forget('courses');
             $response = [
                 'message' => "Successfully deleted course",
             ];

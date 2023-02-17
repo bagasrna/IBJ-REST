@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use App\Libraries\ResponseBase;
 use Illuminate\Validation\Rule;
@@ -13,9 +14,12 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
-        $response = [];
-
+        if (Cache::has('categories')) {
+            $categories = Cache::get('categories');
+        } else {
+            $categories = Category::all();
+            Cache::put('categories', $categories, 600);
+        }
         if (count($categories) > 0) {
             $response = [
                 'data' => $categories,
@@ -24,8 +28,7 @@ class CategoryController extends Controller
             return ResponseBase::success($response);
         }
 
-        $response['message'] = "Categories not found";
-        return ResponseBase::error($response, 404);
+        return ResponseBase::error("Categories not found", 404);
     }
 
     public function store(Request $request)
@@ -41,6 +44,8 @@ class CategoryController extends Controller
             $category->name = $request->name;
             $category->save();
 
+            Cache::forget('categories');
+
             $response = [
                 'data' => $category,
                 'message' => "Successfully added category",
@@ -55,8 +60,6 @@ class CategoryController extends Controller
     public function show($id)
     {
         $category = Category::find($id);
-        $response = [];
-
         if ($category) {
             $response = [
                 'data' => $category,
@@ -65,8 +68,7 @@ class CategoryController extends Controller
             return ResponseBase::success($response);
         }
 
-        $response['message'] = "Category not found";
-        return ResponseBase::error($response, 404);
+        return ResponseBase::error("Category not found", 404);
     }
 
     public function update(Request $request, $id)
@@ -80,14 +82,14 @@ class CategoryController extends Controller
 
         try {
             $category = Category::find($id);
-            $response = [];
             if (!$category){
-                $response['message'] = "Category not found";
-                return ResponseBase::error($response, 404);
+                return ResponseBase::error("Category not found", 404);
             }
 
             $category->name = $request->name;
             $category->save();
+
+            Cache::forget('categories');
 
             $response = [
                 'data' => $category,
@@ -103,13 +105,12 @@ class CategoryController extends Controller
     {
         try {
             $category = Category::with('courses')->find($id);
-            $response = [];
             if (!$category){
-                $response['message'] = "Category not found";
-                return ResponseBase::error($response, 404);
+                return ResponseBase::error("Category not found", 404);
             }
 
             $category->delete();
+            Cache::forget('categories');
             $response = [
                 'message' => "Successfully deleted category",
             ];
