@@ -40,7 +40,7 @@ class AdminController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:admin',
-            'password' => 'required',
+            'password' => 'required|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
         ];
 
         $validator = Validator::make($request->all(), $rules);
