@@ -33,6 +33,6 @@ class ResponseBase
         $response['status'] = 'error';
         $response['message'] = $message;
 
-        return response()->json($response);
+        return response()->json($response, $code);
     }
 }
