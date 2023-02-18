@@ -38,7 +38,7 @@ class AdminController extends Controller
     public function register(Request $request)
     {
         $rules = [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z ]+$/',
             'email' => 'required|string|email|max:255|unique:admin',
             'password' => 'required|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
         ];
