@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
-use App\Libraries\ResponseBase;
-use App\Models\Category;
 use Illuminate\Validation\Rule;
+use App\Libraries\ResponseBase;
 use Illuminate\Http\Request;
+use App\Models\Category;
 use App\Models\Course;
 
 class CourseController extends Controller

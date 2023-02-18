@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use App\Libraries\ResponseBase;
 use Illuminate\Validation\Rule;
@@ -33,7 +34,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z ]+$/',
             'email' => 'required|email|unique:users',
             'password' => 'required|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/'
         ];
