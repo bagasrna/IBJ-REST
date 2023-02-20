@@ -17,7 +17,7 @@ Proyek ini adalah API untuk mengelola data kelas, peserta, dan kategori kelas de
 - Sistem Autentikasi: JSON Web Tokens (JWT)
 - Cache: Database
 
-## Cara Menjalankan Proyek
+## Cara Menjalankan Proyek (Local)
 
 - Clone repositori ini ke lokal Anda.
 - Jalankan composer install untuk menginstal semua dependensi.
@@ -26,6 +26,9 @@ Proyek ini adalah API untuk mengelola data kelas, peserta, dan kategori kelas de
 - Jalankan php artisan db:seed untuk memasukkan data awal ke dalam tabel.
 - Jalankan php artisan serve untuk menjalankan aplikasi.
 
-### Cara Penggunaan
+### Cara Penggunaan (Hosting)
 
-Postman : https://documenter.getpostman.com/view/19502990/2s93CGRvWX
+- Pastikan get API artisan migrate fresh & optimize terlebih dahulu yang tersedia pada API contract postman
+- Lalu gunakan API sesuai dengan flow seperti pada umumnya
+
+- Postman : https://documenter.getpostman.com/view/19502990/2s93CGRvWX
